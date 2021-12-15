@@ -3,17 +3,11 @@
 
 name: Python application
 
-on:
-  push:
-    branches: [ $default-branch ]
-  pull_request:
-    branches: [ $default-branch ]
+on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8.9
@@ -33,4 +27,3 @@ jobs:
     - name: Test with unittest
       run: |
         python -m unittest test_whitelist.py
-
