@@ -11,7 +11,6 @@ class WhitelistTable:
 
     def get_table_headers(self):
         cursor = self.conn.execute("SELECT * FROM whitelist")
-
         return [description[0] for description in cursor.description]
 
     def get_user(self, username: str) -> tuple:
@@ -19,8 +18,6 @@ class WhitelistTable:
         return cursor.execute("SELECT * FROM whitelist WHERE username = ?", (username,)).fetchone()
 
     def get_users(self, users=None) -> list:
-        print(users)
-        print(type(users))
         if users is not None:
             users = ', '.join(f"'{u}'" for u in users)
             sql_query = f"SELECT * FROM whitelist WHERE username IN ({users})"
