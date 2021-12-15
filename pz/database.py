@@ -30,7 +30,7 @@ class WhitelistTable:
         """should return ID on success, None on failure"""
         pass
 
-    def edit_user(self, uid: int, **kwargs):
+    def _edit_user(self, uid: int, **kwargs):
         cursor = self.conn.cursor()
         if kwargs:
             sql_query = f"UPDATE whitelist SET "
