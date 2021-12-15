@@ -22,8 +22,6 @@ class WhitelistTable:
         print(users)
         print(type(users))
         if users is not None:
-            #users = ",".join(users)
-            #users = ",".join(users)
             users = ', '.join(f"'{u}'" for u in users)
             sql_query = f"SELECT * FROM whitelist WHERE username IN ({users})"
         else:
