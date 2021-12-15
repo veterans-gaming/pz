@@ -23,7 +23,6 @@ class WhitelistTable:
             sql_query = f"SELECT * FROM whitelist WHERE username IN ({users})"
         else:
             sql_query = "SELECT * FROM whitelist"
-        print(sql_query)
         cursor = self.conn.cursor()
         return cursor.execute(sql_query).fetchall()
 
