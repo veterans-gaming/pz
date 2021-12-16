@@ -1,4 +1,5 @@
 import sqlite3
+import sys
 
 
 class WhitelistTable:
@@ -9,7 +10,7 @@ class WhitelistTable:
     def __contains__(self, item: str) -> bool:
         if self.get_user(item): return True
 
-    def get_table_headers(self):
+    def get_table_headers(self) -> list:
         cursor = self.conn.execute("SELECT * FROM whitelist")
         return [description[0] for description in cursor.description]
 
@@ -26,11 +27,26 @@ class WhitelistTable:
         cursor = self.conn.cursor()
         return cursor.execute(sql_query).fetchall()
 
-    def add_user(self, username: str):
+    def add_user(self, username="", password="", access=None):
         """should return ID on success, None on failure"""
-        pass
+        if self.get_user(username):
+            print("User already exists")
+            self.conn.close()
+            sys.exit()
+        if password == "":
+            password = "changeme"
+        if access is None:
+            access = "NULL"
+        cursor = self.conn.cursor()
+        sql_query = """
+            INSERT INTO whitelist
+                (username, password, admin, moderator, banned, encryptedPwd, pwdEncryptType, accesslevel, transactionID, displayName)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
+        cursor.execute(sql_query, (username, password, "false", "false", "false", "false", 1, "", 0, username))
+        self.conn.commit()
 
-    def _edit_user(self, uid: int, **kwargs):
+    def _edit_user(self, uid: int, **kwargs) -> None:
         cursor = self.conn.cursor()
         if kwargs:
             sql_query = f"UPDATE whitelist SET "
@@ -45,8 +61,22 @@ class WhitelistTable:
             cursor.execute(sql_query)
         self.conn.commit()
 
-    def get_user_id(self, username):
+    def get_user_id(self, username: str) -> str:
         return self.get_user(username)[0]
 
-    def change_password(self):
-        pass
+    def change_password(self, username: str, password: str):
+        cursor = self.conn.cursor()
+        uid = self.get_user_id(username)
+        self._edit_user(uid, password=password, encryptedPwd=False, pwdEncryptType=1)
+
+    def delete_user(self, username="", uid=-1):
+        if uid < 0:
+            if not username:
+                raise ValueError("Username cant be NULL if UID is not present")
+            uid = self.get_user_id(username)
+        cursor = self.conn.cursor()
+        sql_query = "DELETE FROM whitelist WHERE id = ?"
+        cursor.execute(sql_query, (uid,))
+        self.conn.commit()
+
+
